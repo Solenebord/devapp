@@ -7,8 +7,11 @@ import HomeScreen from './src/HomeScreen';
 import PokedexKantoScreen from './src/PokedexKantoScreen';
 import TeamScreen from './src/TeamScreen';
 import ProfileScreen from './src/ProfileScreen';
+import PokemonDetailScreen from './src/PokemonDetailScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -69,7 +72,12 @@ const AppNavigation = () => {
           }}
         />
         {/* Vous pouvez ajouter d'autres écrans au stack global si nécessaire */}
+        <Stack.Screen name="Pokedex" component={PokedexKantoScreen} />
+        <Stack.Screen name="PokemonDetail" component={PokemonDetailScreen} />
+        <Stack.Screen name="Team" component={TeamScreen} />
       </Stack.Navigator>
+
+
     </NavigationContainer>
   );
 };
