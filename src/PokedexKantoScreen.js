@@ -3,10 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
+import SearchBar from './components/SearchBar.js';
 
 const PokedexKantoScreen = () => {
   const navigation = useNavigation();
   const [kantoPokemon, setKantoPokemon] = useState([]);
+  const [filteredPokemon, setFilteredPokemon] = useState([]);
   const [loading, setLoading] = useState(true);
   const [offset, setOffset] = useState(0);
 
@@ -50,6 +52,15 @@ const PokedexKantoScreen = () => {
         
     };
 
+    const handleSearch = (query) => {
+      // Filtrer les Pokémon en fonction de la recherche
+      const filteredResults = kantoPokemon.filter((pokemon) =>
+        pokemon.name.toLowerCase().includes(query.toLowerCase())
+      );
+      console.log('Filtered Results:', filteredResults);
+      setFilteredPokemon(filteredResults);
+    };
+
   const renderItem = ({ item }) => {
     //const pokemonData = kantoPokemon.find(pokemon => pokemon.name === item.name);
     
@@ -74,8 +85,9 @@ const PokedexKantoScreen = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: 'lightgrey', alignItems: 'center', justifyContent: 'center' }}>
+      <SearchBar onSearch={handleSearch} />
       <FlatList
-        data={kantoPokemon}
+        data={filteredPokemon.length > 0 ? filteredPokemon : kantoPokemon}
         renderItem={renderItem}
         keyExtractor={(item) => item.name}
         numColumns={2}
