@@ -1,25 +1,43 @@
-// HomeScreen.js
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, Text } from 'react-native';
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Hello World</Text>
+    <View style={{ displayFlex: 'column', height:'100%', alignItems:'center', justifyContent:'center'}}>
+      
+      <TouchableOpacity
+            style={{
+              alignItems: 'center',  
+              justifyContent: 'center',  
+              width: 300,  
+              height: 160,  
+              backgroundColor: 'tomato',  
+              borderRadius: 30,
+              margin: 50,
+            }}
+            onPress={() => navigation.navigate('Pokedex')}
+          >
+        <Text style={{ textAlign: 'center', color: 'white', fontSize: 30 }}>Pokedex</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+            style={{
+              alignItems: 'center',  
+              justifyContent: 'center',  
+              width: 300,  
+              height: 160,  
+              backgroundColor: 'tomato',  
+              borderRadius: 30,
+              margin: 50,
+            }}
+            onPress={() => navigation.navigate('Team')}
+          >
+        <Text style={{ textAlign: 'center', color: 'white', fontSize: 30}}>Team</Text>
+      </TouchableOpacity>
+      
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-});
+
 
 export default HomeScreen;

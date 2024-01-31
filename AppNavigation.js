@@ -1,4 +1,3 @@
-// AppNavigation.js
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -9,8 +8,7 @@ import TeamScreen from './src/TeamScreen';
 import ProfileScreen from './src/ProfileScreen';
 import PokemonDetailScreen from './src/PokemonDetailScreen';
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+
 
 
 const Stack = createStackNavigator();
@@ -62,16 +60,8 @@ const AppNavigation = () => {
           options={{ 
             title: 'Main',
             headerShown: false,
-            headerBackTitle: 'Retour',
-            headerBackImage: () => (
-              <Image
-                source={require('./bildad.jpg')}
-                style={{ width: 24, height: 24, marginLeft: 10 }}
-              />
-            ),
           }}
         />
-        {/* Vous pouvez ajouter d'autres écrans au stack global si nécessaire */}
         <Stack.Screen name="Pokedex" component={PokedexKantoScreen} />
         <Stack.Screen name="PokemonDetail" component={PokemonDetailScreen} />
         <Stack.Screen name="Team" component={TeamScreen} />
