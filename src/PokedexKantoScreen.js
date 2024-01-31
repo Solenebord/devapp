@@ -11,55 +11,78 @@ const PokedexKantoScreen = () => {
   const [filteredPokemon, setFilteredPokemon] = useState([]);
   const [loading, setLoading] = useState(true);
   const [offset, setOffset] = useState(0);
+  const [numColumns, setNumColumns] = useState(1);
+  const [isFetching, setIsFetching] = useState(false);
+  const [totalKantoPokemon, setTotalKantoPokemon] = useState(0);
 
+ 
   useEffect(() => {
-    const fetchKantoPokemon = async () => {
+    const fetchTotalKantoPokemon = async () => {
       try {
-        setLoading(true);
-        // Appel à l'API pour obtenir la liste des Pokémon de Kanto
         const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151');
-        const kantoPokemonUrls = response.data.results;
-
-        const kantoPokemonDetails = await Promise.all(
-          kantoPokemonUrls.map(async (pokemon) => {
-            const pokemonDetailsResponse = await axios.get(pokemon.url);
-            return pokemonDetailsResponse.data;
-          })
-        );
-
-        
-
-        // Mise à jour de l'état avec les données des Pokémon de Kanto
-        // setKantoPokemon(kantoPokemonDetails);
-        setKantoPokemon((prevPokemon) => [...prevPokemon, ...kantoPokemonDetails]);
-        setLoading(false);
+        setTotalKantoPokemon(response.data.count);
       } catch (error) {
-        console.error('Erreur lors de la récupération des données Pokémon de Kanto:', error.message);
-        setLoading(false);
+        console.error('Erreur lors de la récupération du nombre total de Pokémon de Kanto:', error.message);
       }
     };
 
-    // setOffset(0);
-
-    // Appel de la fonction
-    fetchKantoPokemon();
+    fetchTotalKantoPokemon();
   }, []);
 
-    const handleLoadMore = () => {
-      // Charger plus de Pokémon lorsque l'utilisateur atteint la fin de la liste
-      
-        setOffset((prevOffset) => prevOffset + 5);
-        
-    };
 
-    const handleSearch = (query) => {
-      // Filtrer les Pokémon en fonction de la recherche
-      const filteredResults = kantoPokemon.filter((pokemon) =>
-        pokemon.name.toLowerCase().includes(query.toLowerCase())
+  const fetchKantoPokemon = async () => {
+    try {
+      if (isFetching) return;
+      setLoading(true);
+      setIsFetching(true);
+      
+      const response = await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=151&offset=${kantoPokemon.length}`);
+      const kantoPokemonUrls = response.data.results;
+
+      const kantoPokemonDetails = await Promise.all(
+        kantoPokemonUrls.map(async (pokemon) => {
+          const pokemonDetailsResponse = await axios.get(pokemon.url);
+          return pokemonDetailsResponse.data;
+        })
       );
-      console.log('Filtered Results:', filteredResults);
-      setFilteredPokemon(filteredResults);
-    };
+
+      setKantoPokemon((prevPokemon) => [...prevPokemon, ...kantoPokemonDetails]);
+      setLoading(false);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des données Pokémon de Kanto:', error.message);
+      setLoading(false);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    console.log('Fetching Kanto Pokemon...');
+    fetchKantoPokemon();
+  }, [offset]);
+
+  useEffect(() => {
+    console.log('Kanto Pokemon updated:', kantoPokemon.length);
+  }, [kantoPokemon]);
+
+  const handleLoadMore = () => {
+    if (kantoPokemon.length >= totalKantoPokemon || isFetching) {
+      console.log('Tous les Pokémon de Kanto ont été chargés ou le chargement est en cours.');
+      return;
+    }
+
+    // Charger plus de Pokémon lorsque l'utilisateur atteint la fin de la liste
+    setOffset((prevOffset) => prevOffset + 5);
+  };
+
+  const handleSearch = (query) => {
+    const filteredResults = kantoPokemon.filter((pokemon) =>
+      pokemon.name.toLowerCase().includes(query.toLowerCase())
+    );
+    console.log('Filtered Results:', filteredResults);
+    setFilteredPokemon(filteredResults);
+  };
+
 
   const renderItem = ({ item }) => {
     //const pokemonData = kantoPokemon.find(pokemon => pokemon.name === item.name);
@@ -67,11 +90,26 @@ const PokedexKantoScreen = () => {
     return (
       <TouchableOpacity
         onPress={() => navigation.navigate('PokemonDetail', { pokemon: item })}
-        style={{ padding: 20, borderRadius: 10, margin: 10, backgroundColor: 'lightblue' }}
+        /* style={{ flex: 1,
+          padding: 0,
+          width: '100%',
+          borderRadius: 10,
+          margin: 0,
+          backgroundColor: 'lightpink', }} */
       >
-        <View style={{ padding: 20, borderRadius: 10, margin: 10, backgroundColor: 'lightblue' }}>
+        <View style={{ flex: 1,
+        padding: 5,
+        borderBottomLeftRadius: 100,
+        borderTopLeftRadius:100,
+        margin: 10,
+        marginRight: 0,
+        backgroundColor: 'lightblue',
+        alignItems: 'center', 
+        
+        
+        }}>
           <Image
-            style={{ width: 50, height: 50 }}
+            style={{ width: 100, height: 100 }}
             source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${item.id}.png` }}
           />
           <Text style={{ textAlign: 'center', fontSize: 18, fontWeight: 'bold' }}>{item.name}</Text>
@@ -84,13 +122,14 @@ const PokedexKantoScreen = () => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'lightgrey', alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ flex: 1, backgroundColor: 'lightgrey', alignItems: 'center', justifyContent: 'center'}}>
       <SearchBar onSearch={handleSearch} />
       <FlatList
+        style={{ width: '100%' }}
         data={filteredPokemon.length > 0 ? filteredPokemon : kantoPokemon}
-        renderItem={renderItem}
+        renderItem={renderItem} 
         keyExtractor={(item) => item.name}
-        numColumns={2}
+        numColumns={numColumns}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.1}
         ListFooterComponent={loading && <Text>Loading...</Text>}
